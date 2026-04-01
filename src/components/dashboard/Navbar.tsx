@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth.context";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/utils/cn";
 import { APP_NAME } from "@/config/constants";
-import { Video, LayoutDashboard, CreditCard, LogOut } from "lucide-react";
+import { Video, LayoutDashboard, CreditCard, LogOut, Menu, X } from "lucide-react";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,6 +19,7 @@ export function Navbar() {
   const { user, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   async function handleSignOut() {
     await signOut();
@@ -63,6 +64,18 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden gap-2"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleSignOut}
               className="gap-2"
             >
@@ -71,6 +84,30 @@ export function Navbar() {
             </Button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 bg-white py-2">
+            <nav className="space-y-1 px-2">
+              {navLinks.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    pathname === href
+                      ? "bg-brand-50 text-brand-700"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );

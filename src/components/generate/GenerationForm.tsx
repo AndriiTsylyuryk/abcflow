@@ -90,7 +90,7 @@ export function GenerationForm({ currentPlan, creditsRemaining }: GenerationForm
     return (
       <Alert variant="warning">
         You need an active subscription to generate videos.{" "}
-        <Link href="/pricing" className="font-medium underline">View plans →</Link>
+        <Link href="/billing" className="font-medium underline">View plans →</Link>
       </Alert>
     );
   }

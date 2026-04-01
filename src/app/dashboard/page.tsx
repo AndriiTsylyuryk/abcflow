@@ -97,7 +97,7 @@ function DashboardContent() {
       {!hasActiveSub && (
         <Alert variant="warning" title="No active subscription">
           Subscribe to a plan to start generating videos.{" "}
-          <Link href="/pricing" className="font-medium underline">
+          <Link href="/billing" className="font-medium underline">
             View plans →
           </Link>
         </Alert>
