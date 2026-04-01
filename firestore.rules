@@ -1,0 +1,64 @@
+// Firestore Security Rules for ABCflow
+//
+// NOTE: Business logic validation happens server-side via Firebase Admin SDK.
+// These rules enforce the principle of least privilege from the client.
+// The Admin SDK (used in API routes) bypasses these rules, which is intentional.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: is the request from an authenticated user?
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: is the document owned by the requesting user?
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ── users ──────────────────────────────────────────────────────────────
+    // Users can only read their own document.
+    // Writes are ONLY allowed via Admin SDK (server-side).
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow write: if false; // Server-side only
+    }
+
+    // ── subscriptions ──────────────────────────────────────────────────────
+    // Users can read their own subscription.
+    // Writes are ONLY allowed via Admin SDK (webhook handlers).
+    match /subscriptions/{subscriptionId} {
+      allow read: if isAuth() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    // ── generationJobs ─────────────────────────────────────────────────────
+    // Users can read their own jobs.
+    // Writes are ONLY allowed via Admin SDK (generation service).
+    match /generationJobs/{jobId} {
+      allow read: if isAuth() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    // ── usageTransactions ──────────────────────────────────────────────────
+    // Users can read their own transactions (audit trail).
+    // Writes are ONLY allowed via Admin SDK.
+    match /usageTransactions/{txId} {
+      allow read: if isAuth() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    // ── webhookEvents ──────────────────────────────────────────────────────
+    // No client access. Admin SDK only.
+    match /webhookEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

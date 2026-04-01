@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #111827;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .prose-tight p {
+    margin: 0;
+  }
+}
+
+/* ── Stripe-style flowing gradient animation ─────────────────────────────── */
+@keyframes blob-1 {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  33%       { transform: translate(8%, -12%) scale(1.08); }
+  66%       { transform: translate(-6%, 8%) scale(0.95); }
+}
+@keyframes blob-2 {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  33%       { transform: translate(-10%, 10%) scale(1.05); }
+  66%       { transform: translate(12%, -8%) scale(1.1); }
+}
+@keyframes blob-3 {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  33%       { transform: translate(10%, 6%) scale(0.92); }
+  66%       { transform: translate(-8%, -10%) scale(1.06); }
+}
+@keyframes blob-4 {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  33%       { transform: translate(-6%, -8%) scale(1.1); }
+  66%       { transform: translate(8%, 12%) scale(0.96); }
+}
+@keyframes blob-5 {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  50%       { transform: translate(-10%, 6%) scale(1.08); }
+}
+
+.animate-blob-1 { animation: blob-1 18s ease-in-out infinite; }
+.animate-blob-2 { animation: blob-2 22s ease-in-out infinite; }
+.animate-blob-3 { animation: blob-3 16s ease-in-out infinite; }
+.animate-blob-4 { animation: blob-4 20s ease-in-out infinite; }
+.animate-blob-5 { animation: blob-5 14s ease-in-out infinite; }

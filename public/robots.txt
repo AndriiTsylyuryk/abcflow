@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /generate
+Disallow: /billing
+Disallow: /api/
+
+Sitemap: https://abcflow.online/sitemap.xml
