@@ -184,14 +184,21 @@ export const MODELS: Record<ModelId, ModelConfig> = {
     maxResolutionTier: "premium",
     supportedAspectRatios: ["16:9", "9:16", "1:1"],
     defaultAspectRatio: "16:9",
-    defaultVariantKey: "standard",
+    defaultVariantKey: "fast",
     variants: [
       {
-        key: "standard",
-        label: "~8 seconds",
+        key: "fast",
+        label: "Fast · ~8s",
         creditCost: c(60), // 180
         requiresPremiumTier: true,
         providerParams: { model: "veo3_fast" },
+      },
+      {
+        key: "quality",
+        label: "Quality · ~8s",
+        creditCost: c(250), // 750
+        requiresPremiumTier: true,
+        providerParams: { model: "veo3" },
       },
     ],
   },

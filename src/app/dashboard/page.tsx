@@ -14,14 +14,14 @@ import { PLANS } from "@/config/plans";
 import { MODELS } from "@/config/models";
 import { formatDistanceToNow } from "date-fns";
 import type { DashboardData } from "@/types/api";
-import { Loader2, Video, Plus, ArrowRight } from "lucide-react";
+import { Loader2, Video, Plus, ArrowRight, Download } from "lucide-react";
 import type { ModelId } from "@/config/models";
 
 // Inner component uses useSearchParams — must be inside Suspense
 function DashboardContent() {
   const { getIdToken } = useAuth();
   const searchParams = useSearchParams();
-  const newJobId = searchParams.get("newJob");
+  searchParams.get("newJob"); // keeps Suspense boundary needed for useSearchParams
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,16 +43,42 @@ function DashboardContent() {
     setLoading(false);
   }, [getIdToken]);
 
+  // Poll each in-progress job against KLIFGEN, then refresh dashboard data
+  const pollActiveJobs = useCallback(async () => {
+    const token = await getIdToken();
+    if (!token || !data) return;
+
+    const activeJobs = data.recentJobs.filter(
+      (j) => j.status === "pending" || j.status === "processing"
+    );
+    if (activeJobs.length === 0) return;
+
+    await Promise.all(
+      activeJobs.map((j) =>
+        fetch(`/api/jobs/${j.jobId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => null)
+      )
+    );
+
+    // Reload dashboard to reflect updated statuses from Firestore
+    await fetchDashboard();
+  }, [getIdToken, data, fetchDashboard]);
+
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  // Auto-refresh when a new job was just started
+  // Poll active jobs every 10s whenever any are in progress
   useEffect(() => {
-    if (!newJobId) return;
-    const interval = setInterval(fetchDashboard, 5000);
+    const hasActive = data?.recentJobs.some(
+      (j) => j.status === "pending" || j.status === "processing"
+    );
+    if (!hasActive) return;
+
+    const interval = setInterval(pollActiveJobs, 10_000);
     return () => clearInterval(interval);
-  }, [newJobId, fetchDashboard]);
+  }, [data, pollActiveJobs]);
 
   if (loading) {
     return (
@@ -220,64 +246,57 @@ function DashboardContent() {
             </CardContent>
           </Card>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">
-                    Model
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden sm:table-cell">
-                    Prompt
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">
-                    Cost
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden lg:table-cell">
-                    Started
-                  </th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {recentJobs.map((job) => (
-                  <tr key={job.jobId} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
-                      {MODELS[job.model as ModelId]?.displayName ?? job.model}
-                    </td>
-                    <td className="px-4 py-3 text-gray-500 hidden sm:table-cell max-w-xs">
-                      <span className="truncate block">{job.prompt}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <JobStatusBadge status={job.status} />
-                    </td>
-                    <td className="px-4 py-3 text-gray-500 hidden md:table-cell">
-                      {job.usageCost} credits
-                    </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs hidden lg:table-cell">
-                      {formatDistanceToNow(new Date(job.requestedAt), {
-                        addSuffix: true,
-                      })}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {job.resultUrl && (
-                        <a
-                          href={job.resultUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-brand-600 hover:text-brand-700 font-medium"
-                        >
-                          View →
-                        </a>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentJobs.map((job) => (
+              <div
+                key={job.jobId}
+                className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm"
+              >
+                {/* Video / placeholder area */}
+                <div className="relative bg-gray-900 aspect-video flex items-center justify-center">
+                  {job.resultUrl ? (
+                    <video
+                      src={job.resultUrl}
+                      controls
+                      playsInline
+                      className="w-full h-full object-contain"
+                    />
+                  ) : job.status === "failed" || job.status === "refunded" ? (
+                    <div className="text-center px-4">
+                      <p className="text-red-400 text-xs font-medium">Generation failed</p>
+                      <p className="text-gray-500 text-xs mt-1">Credits refunded</p>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-400 text-xs">Processing…</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="p-3 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs text-gray-700 line-clamp-2 flex-1">{job.prompt}</p>
+                    <JobStatusBadge status={job.status} />
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>{MODELS[job.model as ModelId]?.displayName ?? job.model} · {job.usageCost} credits</span>
+                    <span>{formatDistanceToNow(new Date(job.requestedAt), { addSuffix: true })}</span>
+                  </div>
+                  {job.resultUrl && (
+                    <a
+                      href={job.resultUrl}
+                      download
+                      className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-gray-200 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -53,9 +53,9 @@ export type UsageTxType = (typeof USAGE_TX_TYPE)[keyof typeof USAGE_TX_TYPE];
 
 /** Polling settings for KLIFGEN job status checks */
 export const POLLING = {
-  /** How often to poll (ms) */
-  INTERVAL_MS: 5_000,
-  /** Max poll attempts before giving up */
+  /** How often to poll (ms) — KLIFGEN recommends 10–15s */
+  INTERVAL_MS: 10_000,
+  /** Max poll attempts before giving up (~10 min at 10s) */
   MAX_ATTEMPTS: 60,
   /** Timeout for a single HTTP request to provider (ms) */
   REQUEST_TIMEOUT_MS: 15_000,

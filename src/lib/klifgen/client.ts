@@ -140,9 +140,14 @@ export class KlifgenProvider implements VideoProvider {
       params[k] = String(v);
     }
 
-    // Optional image input
+    // Optional image input.
+    // Image endpoints (nano-banana, grok-imagine-image) require has_image=1.
+    // Video endpoints (sora2, grok-imagine, seedance, veo3) just need image_url.
     if (request.imageUrl) {
-      params.has_image = "1";
+      const isImageEndpoint =
+        modelConfig.providerEndpoint.includes("nano-banana") ||
+        modelConfig.providerEndpoint.includes("grok-imagine-image");
+      if (isImageEndpoint) params.has_image = "1";
       params.image_url = request.imageUrl;
     }
 
@@ -150,6 +155,8 @@ export class KlifgenProvider implements VideoProvider {
       modelConfig.providerEndpoint,
       params
     );
+
+    console.log(`[KLIFGEN] ${modelConfig.providerEndpoint} response:`, JSON.stringify(result));
 
     if (!result.success || !result.task_id) {
       throw new ProviderError(
