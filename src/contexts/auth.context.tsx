@@ -60,7 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // SameSite=Lax (not Strict) so the cookie is sent after returning
         // from cross-site redirects like Stripe Checkout.
         const secure = location.protocol === "https:" ? "; Secure" : "";
-        document.cookie = `__session=${token}; path=/; SameSite=Lax${secure}`;
+        // max-age=3600 matches Firebase ID token lifetime (1 hour)
+        document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Lax${secure}`;
       } else {
         document.cookie =
           "__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";

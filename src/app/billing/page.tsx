@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Alert } from "@/components/ui/Alert";
 import { PLANS } from "@/config/plans";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, X } from "lucide-react";
 import { InfoTooltip } from "@/components/ui/Tooltip";
+import { MODELS } from "@/config/models";
+import type { ModelId } from "@/config/models";
 import type { DashboardData } from "@/types/api";
 
 const PLAN_META: Record<string, { tagline: string; videos: string; premiumNote?: string }> = {
@@ -23,6 +25,7 @@ function BillingContent() {
   const { getIdToken } = useAuth();
   const searchParams = useSearchParams();
   const successParam = searchParams.get("subscribed") ?? searchParams.get("success");
+  const canceledParam = searchParams.get("canceled");
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,6 +118,12 @@ function BillingContent() {
         </Alert>
       )}
 
+      {canceledParam && (
+        <Alert variant="warning" title="Payment not completed">
+          No charge was made. You can subscribe below whenever you&apos;re ready.
+        </Alert>
+      )}
+
       {error && <Alert variant="error">{error}</Alert>}
 
       {/* Current subscription */}
@@ -169,47 +178,81 @@ function BillingContent() {
           <h2 className="text-base font-semibold text-gray-900">
             Choose a plan
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {(["creator", "growth"] as const).map((planId) => {
               const plan = PLANS[planId];
+              const meta = PLAN_META[planId];
               return (
-                <Card key={planId}>
-                  <CardContent className="space-y-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                      <p className="text-xs font-medium text-brand-600">{PLAN_META[planId]?.tagline}</p>
-                      <p className="text-2xl font-bold mt-1">
-                        €{plan.priceEur}
-                        <span className="text-sm font-normal text-gray-400">/mo</span>
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">{plan.description}</p>
+                <div
+                  key={planId}
+                  className={`rounded-2xl border-2 p-6 bg-white ${
+                    planId === "growth"
+                      ? "border-brand-500 shadow-xl shadow-brand-100/40"
+                      : "border-gray-200"
+                  }`}
+                >
+                  {planId === "growth" && (
+                    <span className="inline-block bg-brand-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">
+                      Most popular
+                    </span>
+                  )}
+
+                  <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
+                  <p className="text-xs font-medium text-brand-600 mt-0.5">{meta?.tagline}</p>
+                  <p className="text-3xl font-extrabold text-gray-900 mt-2">
+                    €{plan.priceEur}
+                    <span className="text-base font-normal text-gray-400">/mo</span>
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">{plan.description}</p>
+
+                  <div className="mt-5 space-y-2.5">
+                    <BillingFeature label={`${plan.monthlyUsageCredits.toLocaleString()} credits/month`} />
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{meta?.videos}</span>
+                      <InfoTooltip text="Estimates based on average usage. Actual usage may vary." />
                     </div>
-                    <ul className="text-sm text-gray-600 space-y-1.5">
-                      <li>✓ {plan.monthlyUsageCredits.toLocaleString()} credits/month</li>
-                      <li className="flex items-center gap-1">
-                        ✓ {PLAN_META[planId]?.videos}
+                    {meta?.premiumNote && (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{meta.premiumNote}</span>
                         <InfoTooltip text="Estimates based on average usage. Actual usage may vary." />
-                      </li>
-                      {PLAN_META[planId]?.premiumNote && (
-                        <li className="flex items-center gap-1">
-                          ✓ {PLAN_META[planId].premiumNote}
-                          <InfoTooltip text="Estimates based on average usage. Actual usage may vary." />
-                        </li>
-                      )}
-                      <li>✓ Max {plan.maxResolutionTier === "premium" ? "1080p" : "720p"}</li>
-                      <li>✓ Up to {plan.maxConcurrentJobs} concurrent jobs</li>
-                      {plan.priorityQueue && <li>✓ Priority queue</li>}
-                    </ul>
+                      </div>
+                    )}
+                    <BillingFeature label={`Max ${plan.maxResolutionTier === "premium" ? "1080p" : "720p"} resolution`} />
+                    <BillingFeature label={`Up to ${plan.maxConcurrentJobs} concurrent jobs`} />
+                    {plan.priorityQueue && <BillingFeature label="Priority queue" />}
+
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide pt-1">
+                      Available models
+                    </p>
+                    {(Object.values(MODELS) as (typeof MODELS)[keyof typeof MODELS][]).map((m) => {
+                      const included = plan.availableModels.includes(m.id as ModelId);
+                      return (
+                        <div key={m.id} className="flex items-center gap-2">
+                          {included
+                            ? <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            : <X className="h-4 w-4 text-gray-300 flex-shrink-0" />}
+                          <span className={`text-sm ${included ? "text-gray-700" : "text-gray-400"}`}>
+                            {m.displayName}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-6">
                     <Button
                       fullWidth
                       variant={planId === "growth" ? "primary" : "secondary"}
                       onClick={() => handleSubscribe(planId)}
                       loading={checkoutLoading === planId}
+                      size="lg"
                     >
                       Subscribe to {plan.name}
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -237,6 +280,15 @@ function BillingContent() {
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+}
+
+function BillingFeature({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+      <span className="text-sm text-gray-700">{label}</span>
     </div>
   );
 }

@@ -54,11 +54,25 @@ export async function createCheckoutSession(params: {
   }
 
   const priceId = getStripePriceId(params.planId);
-  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   let customerId = user.billingCustomerId ?? undefined;
 
-  // Create or reuse Stripe customer
+  // Create or reuse Stripe customer.
+  // If the stored ID doesn't exist in this Stripe environment (e.g. live ID used
+  // in test mode), create a fresh customer and update the stored ID.
+  if (customerId) {
+    try {
+      await stripe.customers.retrieve(customerId);
+    } catch (err: any) {
+      if (err?.code === "resource_missing") {
+        customerId = undefined;
+      } else {
+        throw err;
+      }
+    }
+  }
+
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: params.email ?? user.email,
@@ -74,7 +88,7 @@ export async function createCheckoutSession(params: {
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${appUrl}${params.returnPath ?? "/billing"}?subscribed=1`,
-    cancel_url: `${appUrl}/pricing?canceled=1`,
+    cancel_url: `${appUrl}${params.returnPath ?? "/billing"}?canceled=1`,
     metadata: {
       uid: params.uid,
       planId: params.planId,
@@ -112,7 +126,7 @@ export async function createPortalSession(uid: string): Promise<string> {
     );
   }
 
-  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   const session = await stripe.billingPortal.sessions.create({
     customer: user.billingCustomerId,
