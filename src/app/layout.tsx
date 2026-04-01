@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "@/contexts/auth.context";
 import "./globals.css";
 
@@ -74,6 +75,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} h-full bg-gray-50 text-gray-900 antialiased`}>
         <AuthProvider>{children}</AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
