@@ -252,15 +252,23 @@ function DashboardContent() {
                 key={job.jobId}
                 className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm"
               >
-                {/* Video / placeholder area */}
+                {/* Media / placeholder area */}
                 <div className="relative bg-gray-900 aspect-video flex items-center justify-center">
                   {job.resultUrl ? (
-                    <video
-                      src={job.resultUrl}
-                      controls
-                      playsInline
-                      className="w-full h-full object-contain"
-                    />
+                    MODELS[job.model as ModelId]?.outputType === "image" ? (
+                      <img
+                        src={job.resultUrl}
+                        alt={job.prompt}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <video
+                        src={job.resultUrl}
+                        controls
+                        playsInline
+                        className="w-full h-full object-contain"
+                      />
+                    )
                   ) : job.status === "failed" || job.status === "refunded" ? (
                     <div className="text-center px-4">
                       <p className="text-red-400 text-xs font-medium">Generation failed</p>

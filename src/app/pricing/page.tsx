@@ -11,13 +11,13 @@ export const metadata: Metadata = { title: "Pricing" };
 const PLAN_MARKETING = {
   creator: {
     tagline: "Best for getting started",
-    videoEstimate: "~20–25 videos/month",
+    videoEstimate: "~20–25 videos · 50+ images/month",
     premiumNote: null,
   },
   growth: {
     tagline: "Best for regular use & higher quality",
-    videoEstimate: "~50–60 videos/month",
-    premiumNote: "~20 premium (VEO) videos",
+    videoEstimate: "~50–60 videos · 150+ images/month",
+    premiumNote: "~20 premium (VEO 3.1) videos",
   },
 } as const;
 
@@ -31,7 +31,7 @@ const PLANS_DISPLAY = [
     maxConcurrentJobs: 2,
     maxResolutionTier: "standard" as const,
     priorityQueue: false,
-    availableModels: ["sora2", "grok_imagine", "seedance_lite"] as string[],
+    availableModels: ["sora2", "grok_imagine", "seedance_lite", "nano_banana_2", "grok_imagine_image"] as string[],
   },
   {
     id: "growth" as const,
@@ -42,7 +42,7 @@ const PLANS_DISPLAY = [
     maxConcurrentJobs: 5,
     maxResolutionTier: "premium" as const,
     priorityQueue: true,
-    availableModels: ["sora2", "grok_imagine", "seedance_lite", "veo3_fast"] as string[],
+    availableModels: ["sora2", "grok_imagine", "seedance_lite", "veo3_fast", "nano_banana_2", "grok_imagine_image"] as string[],
   },
 ];
 

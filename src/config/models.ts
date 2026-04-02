@@ -11,7 +11,7 @@
 import type { ResolutionTier, ModelId } from "./plans";
 
 export type { ModelId } from "./plans";
-export type AspectRatio = "16:9" | "9:16" | "1:1";
+export type AspectRatio = "16:9" | "9:16" | "1:1" | "3:2" | "2:3";
 
 /**
  * A specific generation option for a model (e.g. "720p · 10s").
@@ -36,6 +36,8 @@ export interface ModelConfig {
   provider: "klifgen";
   /** KLIFGEN endpoint path, e.g. /request-sora-2 */
   providerEndpoint: string;
+  /** Whether this model produces video or image output */
+  outputType: "video" | "image";
   variants: ModelVariant[];
   defaultVariantKey: string;
   supportedAspectRatios: AspectRatio[];
@@ -58,6 +60,7 @@ export const MODELS: Record<ModelId, ModelConfig> = {
     description: "OpenAI's Sora 2 — high-quality cinematic video generation.",
     provider: "klifgen",
     providerEndpoint: "/request-sora-2",
+    outputType: "video",
     supportsImageInput: true,
     maxResolutionTier: "standard",
     supportedAspectRatios: ["16:9", "9:16", "1:1"],
@@ -87,40 +90,27 @@ export const MODELS: Record<ModelId, ModelConfig> = {
     description: "xAI's Grok Imagine — fast video generation at 480p or 720p.",
     provider: "klifgen",
     providerEndpoint: "/request-grok-imagine",
+    outputType: "video",
     supportsImageInput: true,
     maxResolutionTier: "standard",
     supportedAspectRatios: ["16:9", "9:16", "1:1"],
     defaultAspectRatio: "16:9",
     defaultVariantKey: "480p_6s",
     variants: [
-      {
-        key: "480p_6s",
-        label: "480p · 6s",
-        creditCost: c(10), // 30
-        requiresPremiumTier: false,
-        providerParams: { resolution: "480p", duration: "6" },
-      },
-      {
-        key: "480p_10s",
-        label: "480p · 10s",
-        creditCost: c(20), // 60
-        requiresPremiumTier: false,
-        providerParams: { resolution: "480p", duration: "10" },
-      },
-      {
-        key: "720p_6s",
-        label: "720p · 6s",
-        creditCost: c(20), // 60
-        requiresPremiumTier: false,
-        providerParams: { resolution: "720p", duration: "6" },
-      },
-      {
-        key: "720p_10s",
-        label: "720p · 10s",
-        creditCost: c(30), // 90
-        requiresPremiumTier: false,
-        providerParams: { resolution: "720p", duration: "10" },
-      },
+      // 480p — full duration range
+      { key: "480p_6s",  label: "480p · 6s",  creditCost: c(10), requiresPremiumTier: false, providerParams: { resolution: "480p", duration: "6" } },
+      { key: "480p_10s", label: "480p · 10s", creditCost: c(20), requiresPremiumTier: false, providerParams: { resolution: "480p", duration: "10" } },
+      { key: "480p_15s", label: "480p · 15s", creditCost: c(25), requiresPremiumTier: false, providerParams: { resolution: "480p", duration: "15" } },
+      { key: "480p_20s", label: "480p · 20s", creditCost: c(32), requiresPremiumTier: false, providerParams: { resolution: "480p", duration: "20" } },
+      { key: "480p_25s", label: "480p · 25s", creditCost: c(40), requiresPremiumTier: false, providerParams: { resolution: "480p", duration: "25" } },
+      { key: "480p_30s", label: "480p · 30s", creditCost: c(50), requiresPremiumTier: false, providerParams: { resolution: "480p", duration: "30" } },
+      // 720p — full duration range
+      { key: "720p_6s",  label: "720p · 6s",  creditCost: c(20), requiresPremiumTier: false, providerParams: { resolution: "720p", duration: "6" } },
+      { key: "720p_10s", label: "720p · 10s", creditCost: c(30), requiresPremiumTier: false, providerParams: { resolution: "720p", duration: "10" } },
+      { key: "720p_15s", label: "720p · 15s", creditCost: c(45), requiresPremiumTier: false, providerParams: { resolution: "720p", duration: "15" } },
+      { key: "720p_20s", label: "720p · 20s", creditCost: c(60), requiresPremiumTier: false, providerParams: { resolution: "720p", duration: "20" } },
+      { key: "720p_25s", label: "720p · 25s", creditCost: c(75), requiresPremiumTier: false, providerParams: { resolution: "720p", duration: "25" } },
+      { key: "720p_30s", label: "720p · 30s", creditCost: c(90), requiresPremiumTier: false, providerParams: { resolution: "720p", duration: "30" } },
     ],
   },
 
@@ -130,6 +120,7 @@ export const MODELS: Record<ModelId, ModelConfig> = {
     description: "ByteDance Seedance Lite — efficient video generation up to 1080p.",
     provider: "klifgen",
     providerEndpoint: "/request-seedance",
+    outputType: "video",
     supportsImageInput: true,
     maxResolutionTier: "premium",
     supportedAspectRatios: ["16:9", "9:16", "1:1"],
@@ -176,10 +167,11 @@ export const MODELS: Record<ModelId, ModelConfig> = {
 
   veo3_fast: {
     id: "veo3_fast",
-    displayName: "Veo 3 Fast",
-    description: "Google's Veo 3 in fast mode — premium quality, ~8 second videos.",
+    displayName: "Veo 3.1",
+    description: "Google's Veo 3.1 — premium quality, ~8 second videos.",
     provider: "klifgen",
     providerEndpoint: "/request-veo3",
+    outputType: "video",
     supportsImageInput: true,
     maxResolutionTier: "premium",
     supportedAspectRatios: ["16:9", "9:16", "1:1"],
@@ -199,6 +191,66 @@ export const MODELS: Record<ModelId, ModelConfig> = {
         creditCost: c(250), // 750
         requiresPremiumTier: true,
         providerParams: { model: "veo3" },
+      },
+    ],
+  },
+
+  nano_banana_2: {
+    id: "nano_banana_2",
+    displayName: "Nano Banana 2",
+    description: "4K AI image generation — fast text-to-image and image editing.",
+    provider: "klifgen",
+    providerEndpoint: "/request-nano-banana-2",
+    outputType: "image",
+    supportsImageInput: true,
+    maxResolutionTier: "premium",
+    supportedAspectRatios: ["16:9", "9:16", "1:1"],
+    defaultAspectRatio: "1:1",
+    defaultVariantKey: "2k",
+    variants: [
+      {
+        key: "1k",
+        label: "1K",
+        creditCost: c(8), // 24
+        requiresPremiumTier: false,
+        providerParams: { resolution: "1K" },
+      },
+      {
+        key: "2k",
+        label: "2K",
+        creditCost: c(12), // 36
+        requiresPremiumTier: false,
+        providerParams: { resolution: "2K" },
+      },
+      {
+        key: "4k",
+        label: "4K",
+        creditCost: c(18), // 54
+        requiresPremiumTier: false,
+        providerParams: { resolution: "4K" },
+      },
+    ],
+  },
+
+  grok_imagine_image: {
+    id: "grok_imagine_image",
+    displayName: "Grok Imagine Image",
+    description: "xAI's Grok Imagine — text-to-image and image-to-image, 4 credits flat.",
+    provider: "klifgen",
+    providerEndpoint: "/request-grok-imagine-image",
+    outputType: "image",
+    supportsImageInput: true,
+    maxResolutionTier: "standard",
+    supportedAspectRatios: ["16:9", "9:16", "1:1", "3:2", "2:3"],
+    defaultAspectRatio: "3:2",
+    defaultVariantKey: "standard",
+    variants: [
+      {
+        key: "standard",
+        label: "Standard",
+        creditCost: c(4), // 12
+        requiresPremiumTier: false,
+        providerParams: {},
       },
     ],
   },

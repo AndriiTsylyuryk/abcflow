@@ -16,8 +16,8 @@ import type { ModelId } from "@/config/models";
 import type { DashboardData } from "@/types/api";
 
 const PLAN_META: Record<string, { tagline: string; videos: string; premiumNote?: string }> = {
-  creator: { tagline: "Best for getting started", videos: "~20–25 videos/month" },
-  growth: { tagline: "Best for regular use & higher quality", videos: "~50–60 videos/month", premiumNote: "~20 premium (VEO) videos" },
+  creator: { tagline: "Best for getting started", videos: "~20–25 videos · 50+ images/month" },
+  growth: { tagline: "Best for regular use & higher quality", videos: "~50–60 videos · 150+ images/month", premiumNote: "~20 premium (VEO 3.1) videos" },
 };
 
 // Inner component uses useSearchParams — must be inside Suspense

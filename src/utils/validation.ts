@@ -68,9 +68,9 @@ export const createCheckoutSchema = z.object({
 // ── Generation schemas ────────────────────────────────────────────────────────
 
 export const createGenerationSchema = z.object({
-  model: z.enum(["sora2", "grok_imagine", "seedance_lite", "veo3_fast"]),
+  model: z.enum(["sora2", "grok_imagine", "seedance_lite", "veo3_fast", "nano_banana_2", "grok_imagine_image"]),
   variantKey: z.string().trim().min(1, "Variant is required.").max(50),
-  aspectRatio: z.enum(["16:9", "9:16", "1:1"]),
+  aspectRatio: z.enum(["16:9", "9:16", "1:1", "3:2", "2:3"]),
   prompt: z
     .string()
     .trim()

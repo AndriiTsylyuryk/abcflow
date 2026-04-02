@@ -9,7 +9,9 @@ export type ModelId =
   | "sora2"
   | "grok_imagine"
   | "seedance_lite"
-  | "veo3_fast";
+  | "veo3_fast"
+  | "nano_banana_2"
+  | "grok_imagine_image";
 
 export interface PlanConfig {
   id: PlanId;
@@ -33,7 +35,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     priceEur: 49,
     stripePriceEnvKey: "STRIPE_CREATOR_PRICE_ID",
     monthlyUsageCredits: 1500,
-    availableModels: ["sora2", "grok_imagine", "seedance_lite"],
+    availableModels: ["sora2", "grok_imagine", "seedance_lite", "nano_banana_2", "grok_imagine_image"],
     maxResolutionTier: "standard",
     priorityQueue: false,
     maxConcurrentJobs: 2,
@@ -46,7 +48,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     priceEur: 89,
     stripePriceEnvKey: "STRIPE_GROWTH_PRICE_ID",
     monthlyUsageCredits: 4000,
-    availableModels: ["sora2", "grok_imagine", "seedance_lite", "veo3_fast"],
+    availableModels: ["sora2", "grok_imagine", "seedance_lite", "veo3_fast", "nano_banana_2", "grok_imagine_image"],
     maxResolutionTier: "premium",
     priorityQueue: true,
     maxConcurrentJobs: 5,

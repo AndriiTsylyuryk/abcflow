@@ -10,8 +10,8 @@ import { GradientHero } from "@/components/ui/GradientHero";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://abcflow.online";
 
 const PLAN_META: Record<string, { tagline: string; videos: string; premiumNote?: string }> = {
-  creator: { tagline: "Best for getting started", videos: "~20–25 videos/month" },
-  growth: { tagline: "Best for regular use & higher quality", videos: "~50–60 videos/month", premiumNote: "~20 premium (VEO) videos" },
+  creator: { tagline: "Best for getting started", videos: "~20–25 videos · 50+ images/month" },
+  growth: { tagline: "Best for regular use & higher quality", videos: "~50–60 videos · 150+ images/month", premiumNote: "~20 premium (VEO 3.1) videos" },
 };
 
 const FAQ_ITEMS = [

@@ -21,6 +21,8 @@ const ASPECT_RATIO_LABELS: Record<AspectRatio, string> = {
   "16:9": "16:9 Landscape",
   "9:16": "9:16 Portrait",
   "1:1": "1:1 Square",
+  "3:2": "3:2 Classic",
+  "2:3": "2:3 Portrait",
 };
 
 export function GenerationForm({ currentPlan, creditsRemaining }: GenerationFormProps) {
