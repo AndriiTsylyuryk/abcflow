@@ -7,14 +7,94 @@ import { CheckCircle2, Zap, Shield, Video } from "lucide-react";
 import { InfoTooltip } from "@/components/ui/Tooltip";
 import { GradientHero } from "@/components/ui/GradientHero";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://abcflow.online";
+
 const PLAN_META: Record<string, { tagline: string; videos: string; premiumNote?: string }> = {
   creator: { tagline: "Best for getting started", videos: "~20–25 videos/month" },
   growth: { tagline: "Best for regular use & higher quality", videos: "~50–60 videos/month", premiumNote: "~20 premium (VEO) videos" },
 };
 
+const FAQ_ITEMS = [
+  {
+    question: "What is an AI video generator?",
+    answer:
+      "An AI video generator uses artificial intelligence to create videos from text descriptions (prompts). Instead of filming or editing footage manually, you describe what you want and the AI produces the video automatically — in seconds.",
+  },
+  {
+    question: "How does text-to-video AI work?",
+    answer:
+      "Text-to-video models are trained on large datasets of video and text pairs. When you enter a prompt, the model interprets your description and generates video frames that match it, outputting a complete clip ready to download.",
+  },
+  {
+    question: "Which AI models does ABCflow support?",
+    answer:
+      "ABCflow supports Sora 2 (OpenAI), Veo 3 Fast (Google DeepMind), Seedance Lite (ByteDance), and Grok Imagine (xAI). Each model has different strengths in quality, speed, and resolution — up to 1080p on the Growth plan.",
+  },
+  {
+    question: "Is ABCflow suitable for marketing and social media videos?",
+    answer:
+      "Yes. ABCflow supports 16:9, 9:16, and 1:1 aspect ratios, making it perfect for YouTube, Instagram Reels, TikTok, and LinkedIn. Create promotional clips, product demos, and social content in seconds without any editing software.",
+  },
+  {
+    question: "Do I need a subscription to use ABCflow?",
+    answer:
+      "Yes. ABCflow uses a simple monthly subscription model — no per-video credits to buy, no top-ups. The Creator plan starts at a low monthly price and includes everything you need to get started with AI video generation.",
+  },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${APP_URL}/#organization`,
+      name: "ABCflow",
+      url: APP_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${APP_URL}/favicon.svg`,
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "andrii@abcflow.online",
+        contactType: "customer support",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${APP_URL}/#website`,
+      url: APP_URL,
+      name: "ABCflow",
+      publisher: { "@id": `${APP_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${APP_URL}/generate?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ_ITEMS.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
+      {/* JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Header */}
       <header className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,9 +140,12 @@ export default function LandingPage() {
       {/* Models */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
             Powered by the best AI models
           </h2>
+          <p className="text-center text-gray-500 mb-12 max-w-xl mx-auto">
+            Access the world&apos;s leading text-to-video AI models through one simple subscription — no separate API keys required.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(Object.values(MODELS) as (typeof MODELS)[keyof typeof MODELS][]).map((model) => (
               <div
@@ -171,6 +254,88 @@ export default function LandingPage() {
               <p className="text-sm text-gray-500">{text}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* What is ABCflow */}
+      <section className="py-16 px-4 bg-gray-50 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            What is ABCflow AI Video Generator?
+          </h2>
+          <p className="text-gray-600 text-lg leading-relaxed mb-4">
+            ABCflow is an online AI video generator that turns text prompts into high-quality videos in seconds. Powered by the world&apos;s most advanced AI models — including OpenAI&apos;s Sora 2, Google&apos;s Veo 3, ByteDance&apos;s Seedance, and xAI&apos;s Grok Imagine — ABCflow makes professional AI video creation accessible to everyone.
+          </p>
+          <p className="text-gray-500 text-base leading-relaxed">
+            Whether you need videos for social media, marketing campaigns, product demos, or creative projects, ABCflow lets you generate them instantly — no video editing skills required.
+          </p>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-16 px-4 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            How to create AI videos from text
+          </h2>
+          <p className="text-center text-gray-500 mb-12">
+            Three simple steps to generate your first AI video
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {[
+              {
+                step: "1",
+                title: "Write your prompt",
+                description:
+                  "Describe the video you want in plain English. Include scene details, style, mood, and any specific elements you need.",
+              },
+              {
+                step: "2",
+                title: "Choose your AI model",
+                description:
+                  "Select from Sora 2, Veo 3, Seedance Lite, or Grok Imagine. Each model offers different resolutions, durations, and visual styles.",
+              },
+              {
+                step: "3",
+                title: "Download your video",
+                description:
+                  "Your AI-generated video is ready in seconds. Watch it directly in the dashboard and download it in full quality.",
+              },
+            ].map(({ step, title, description }) => (
+              <div key={step} className="text-center">
+                <div className="w-12 h-12 rounded-full bg-brand-600 text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
+                  {step}
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/register">
+              <Button size="lg">Create your first AI video</Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 px-4 bg-gray-50 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            Frequently asked questions
+          </h2>
+          <p className="text-center text-gray-500 mb-12">
+            Everything you need to know about AI video generation with ABCflow
+          </p>
+          <div className="space-y-6">
+            {FAQ_ITEMS.map((item) => (
+              <div key={item.question} className="rounded-xl border border-gray-200 bg-white p-6">
+                <h3 className="font-semibold text-gray-900 mb-2">{item.question}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{item.answer}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

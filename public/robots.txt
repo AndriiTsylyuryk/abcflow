@@ -4,5 +4,7 @@ Disallow: /dashboard
 Disallow: /generate
 Disallow: /billing
 Disallow: /api/
+Disallow: /login
+Disallow: /register
 
 Sitemap: https://abcflow.online/sitemap.xml

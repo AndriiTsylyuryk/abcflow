@@ -11,19 +11,22 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://abcflow.online";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "ABCflow — AI Video Generation, Simplified",
+    default: "AI Video Generator Online – Create Videos from Text | ABCflow",
     template: "%s | ABCflow",
   },
   description:
-    "Generate stunning AI videos in seconds with Sora 2, Grok Imagine, Seedance and Veo 3. Simple monthly subscription, no credits to top up.",
+    "Create AI videos from text instantly with ABCflow. Generate high-quality videos using advanced AI models like Sora, Veo, and Seedance in seconds.",
   keywords: [
-    "AI video generation",
+    "AI video generator",
     "text to video",
+    "create AI videos",
+    "AI video generation",
     "Sora 2",
     "Veo 3",
     "Grok video",
     "AI video creator",
     "AI video tool",
+    "text to video AI",
   ],
   authors: [{ name: "ABCflow", url: APP_URL }],
   creator: "ABCflow",
@@ -37,23 +40,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: APP_URL,
     siteName: "ABCflow",
-    title: "ABCflow — AI Video Generation, Simplified",
+    title: "AI Video Generator Online – Create Videos from Text | ABCflow",
     description:
-      "Generate stunning AI videos in seconds with Sora 2, Grok Imagine, Seedance and Veo 3. Simple monthly subscription.",
+      "Create AI videos from text instantly with ABCflow. Generate high-quality videos using Sora 2, Veo 3, Seedance, and Grok Imagine.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "ABCflow — AI Video Generation",
+        alt: "ABCflow — AI Video Generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ABCflow — AI Video Generation, Simplified",
+    title: "AI Video Generator Online – Create Videos from Text | ABCflow",
     description:
-      "Generate stunning AI videos in seconds. Powered by Sora 2, Veo 3, Grok & more.",
+      "Create AI videos from text instantly. Powered by Sora 2, Veo 3, Grok & Seedance.",
     images: ["/og-image.png"],
     creator: "@abcflow",
   },
